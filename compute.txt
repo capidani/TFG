@@ -1,0 +1,37 @@
+CREAMOS EL LMDB
+
+python create_lmdb.py
+
+CREAMOS EL BINARyPROTO
+
+../caffe/build/tools/compute_image_mean -backend=lmdb train_lmdb mean.binaryproto
+
+DIBUJAMOS LA RED
+python ../caffe/python/draw_net.py pruebanet_train_val_1.prototxt ImagenRed.png
+python ../../caffe/python/draw_net.py prueba_train_val.prototxt ImagenRed.png
+
+
+
+ENTRENAMOS LA RED
+
+../caffe/build/tools/caffe train --solver pruebanet_solver.prototxt 2>&1 | tee caffe_model_1/model_1_train.log
+nohup ../caffe/build/tools/caffe train --solver pruebanet_solver.prototxt 2>&1 | tee caffe_model_1/model_1_train.log
+
+
+nohup residente en consola
+
+DIBUJAMOS LA GRAFICA DE APRENDIZAJE
+
+python ../caffe/tools/extra/parse_log.py caffe_model_1/model_1_train.log caffe_model_1/  --delimiter " "
+python dibuja_grafica.py /home/user_cudnn/pruebanet/caffe_model_1/model_1_train.log grafica.png
+
+HACER PREDICCIONES 
+
+python prediccion.py
+
+
+-------------------------
+CON TRANSFER LEARNING desde un modelo pre-entrenado
+
+ ../../caffe/build/tools/caffe train --solver=prueba_sver.prototxt --weights ../caffe_model_1_iter_10000.caffemodel 2>&1 | tee model_prueba_train.log
+
