@@ -35,3 +35,11 @@ CON TRANSFER LEARNING desde un modelo pre-entrenado
 
  ../../caffe/build/tools/caffe train --solver=prueba_sver.prototxt --weights ../caffe_model_1_iter_10000.caffemodel 2>&1 | tee model_prueba_train.log
 
+http://caffe.berkeleyvision.org/tutorial/interfaces.html
+# (These example calls require you complete the LeNet / MNIST example first.)
+# time LeNet training on CPU for 10 iterations
+caffe time -model examples/mnist/lenet_train_test.prototxt -iterations 10
+# time LeNet training on GPU for the default 50 iterations
+caffe time -model examples/mnist/lenet_train_test.prototxt -gpu 0
+# time a model architecture with the given weights on the first GPU for 10 iterations
+caffe time -model examples/mnist/lenet_train_test.prototxt -weights examples/mnist/lenet_iter_10000.caffemodel -gpu 0 -iterations 10
