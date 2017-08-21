@@ -1,5 +1,6 @@
 '''
-Author          :Adil Moujahid
+Autor           :Adil Moujahid
+Modificacion    :Daniel Capitan
 '''
 
 import os
@@ -17,7 +18,7 @@ IMAGE_WIDTH = 227
 IMAGE_HEIGHT = 227
 
 '''
-Image processing helper function
+Tratamiento de imagen
 '''
 
 def transform_img(img, img_width=IMAGE_WIDTH, img_height=IMAGE_HEIGHT):
@@ -34,19 +35,19 @@ def transform_img(img, img_width=IMAGE_WIDTH, img_height=IMAGE_HEIGHT):
 
 
 '''
-Reading mean image, caffe model and its weights 
+Abrir imagenes, modelo y pesos
 '''
 #Read mean image
 mean_blob = caffe_pb2.BlobProto()
-with open('/home/user_cudnn/pruebanet/mean.binaryproto') as f:
+with open('/home/user_cudnn/aplicacionTFG/mean.binaryproto') as f:
     mean_blob.ParseFromString(f.read())
 mean_array = np.asarray(mean_blob.data, dtype=np.float32).reshape(
     (mean_blob.channels, mean_blob.height, mean_blob.width))
 
 
 #Read model architecture and trained model's weights
-net = caffe.Net('/home/user_cudnn/pruebanet/pruebanet_deploy_1.prototxt',
-                '/home/user_cudnn/pruebanet/caffe_model_1_iter_10000.caffemodel',
+net = caffe.Net('/home/user_cudnn/aplicacionTFG/modelos/deploy.prototxt',
+                '/home/user_cudnn/aplicacionTFG/modelos/tfg_modelo_prediccion.caffemodel',
                 caffe.TEST)
 
 #Define image transformers
@@ -55,10 +56,10 @@ transformer.set_mean('data', mean_array)
 transformer.set_transpose('data', (2,0,1))
 
 '''
-Making predicitions
+Predicciones
 '''
 #Reading image paths
-test_img_paths = [img_path for img_path in glob.glob("test1/*jpg")]
+test_img_paths = [img_path for img_path in glob.glob("/home/user_cudnn/aplicacionTFG/imagenes/test/*tiff")]
 
 #Making predictions
 test_ids = []
@@ -78,24 +79,23 @@ for img_path in test_img_paths:
 
     print img_path
     print pred_probas
-    print pred_probas.argmax()
+    #print pred_probas.argmax()
     if pred_probas.argmax()==1:
-        print 'ES UN PERRO'
+        print 'La celula es ALTO GRADO'
     else:
-        print 'ES UN GATO'
+        print 'La celula es BENIGNA'
     print '-------'
 
 '''
-Making submission file
+Crear fichero de resultados
 '''
-with open("caffe_model_1/submission_model_1.csv","w") as f:
+with open("resultado.csv","w") as f:
     f.write("id,tipo,label\n")
     for i in range(len(test_ids)):
         if preds[i]==1:
-            tipo = 'PERRO'
+            tipo = 'ALTO GRADO'
         else:
-            tipo ='GATO'
-    
+            tipo ='BENIGNA'
 
         f.write(str(test_ids[i])+","+str(tipo)+","+str(preds[i])+"\n")
 f.close()

@@ -1,4 +1,4 @@
-name: "Pruebanet"
+name: "TFG"
 layer {
   name: "data"
   type: "Data"
@@ -10,7 +10,7 @@ layer {
   transform_param {
     mirror: true
     crop_size: 227
-    mean_file: "mean.binaryproto"
+    mean_file: "/home/user_cudnn/aplicacionTFG/mean.binaryproto"
   }
 # mean pixel / channel-wise mean instead of mean image
 #  transform_param {
@@ -21,7 +21,7 @@ layer {
 #    mirror: true
 #  }
   data_param {
-    source: "train_lmdb"
+    source: "/home/user_cudnn/aplicacionTFG/imagenes/train_lmdb"
     batch_size: 256
     backend: LMDB
   }
@@ -37,7 +37,7 @@ layer {
   transform_param {
     mirror: false
     crop_size: 227
-    mean_file: "mean.binaryproto"
+    mean_file: "/home/user_cudnn/aplicacionTFG/mean.binaryproto"
   }
 # mean pixel / channel-wise mean instead of mean image
 #  transform_param {
@@ -48,7 +48,7 @@ layer {
 #    mirror: true
 #  }
   data_param {
-    source: "validation_lmdb"
+    source: "/home/user_cudnn/aplicacionTFG/imagenes/validation_lmdb"
     batch_size: 50
     backend: LMDB
   }
@@ -357,10 +357,10 @@ layer {
   }
 }
 layer {
-  name: "fc8"
+  name: "fc8-cellgood-cellbad"
   type: "InnerProduct"
   bottom: "fc7"
-  top: "fc8"
+  top: "fc8-cellgood-cellbad"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -384,7 +384,7 @@ layer {
 layer {
   name: "accuracy"
   type: "Accuracy"
-  bottom: "fc8"
+  bottom: "fc8-cellgood-cellbad"
   bottom: "label"
   top: "accuracy"
   include {
@@ -394,7 +394,7 @@ layer {
 layer {
   name: "loss"
   type: "SoftmaxWithLoss"
-  bottom: "fc8"
+  bottom: "fc8-cellgood-cellbad"
   bottom: "label"
   top: "loss"
 }

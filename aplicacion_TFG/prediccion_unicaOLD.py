@@ -1,6 +1,5 @@
 '''
-Autor           :Adil Moujahid
-Modificacion    :Daniel Capitan
+Author          :Adil Moujahid
 '''
 
 import os
@@ -8,7 +7,6 @@ import glob
 import cv2
 import caffe
 import lmdb
-import sys
 import numpy as np
 from caffe.proto import caffe_pb2
 
@@ -19,10 +17,8 @@ IMAGE_WIDTH = 227
 IMAGE_HEIGHT = 227
 
 '''
-Tratamiento de imagen
+Image processing helper function
 '''
-
-imagenParametro = sys.argv[1]
 
 def transform_img(img, img_width=IMAGE_WIDTH, img_height=IMAGE_HEIGHT):
 
@@ -38,7 +34,7 @@ def transform_img(img, img_width=IMAGE_WIDTH, img_height=IMAGE_HEIGHT):
 
 
 '''
-Abrir imagenes, modelo y pesos
+Reading mean image, caffe model and its weights 
 '''
 #Read mean image
 mean_blob = caffe_pb2.BlobProto()
@@ -50,7 +46,7 @@ mean_array = np.asarray(mean_blob.data, dtype=np.float32).reshape(
 
 #Read model architecture and trained model's weights
 net = caffe.Net('/home/user_cudnn/aplicacionTFG/modelos/deploy.prototxt',
-                '/home/user_cudnn/aplicacionTFG/modelos/tfg_modelo_prediccion.caffemodel',
+                '/home/user_cudnn/aplicacionTFG/modelos/tfg_model_1_iter_10000.caffemodel',
                 caffe.TEST)
 
 #Define image transformers
@@ -59,43 +55,40 @@ transformer.set_mean('data', mean_array)
 transformer.set_transpose('data', (2,0,1))
 
 '''
-Predicciones
+Making predicitions
 '''
 #Reading image paths
-test_img_paths = [img_path for img_path in glob.glob(imagenParametro)]
+test_img_paths = [img_path for img_path in glob.glob("test1/*jpg")]
 
 #Making predictions
 test_ids = []
 preds = []
-
-
 for img_path in test_img_paths:
     img = cv2.imread(img_path, cv2.IMREAD_COLOR)
     img = transform_img(img, img_width=IMAGE_WIDTH, img_height=IMAGE_HEIGHT)
     
     net.blobs['data'].data[...] = transformer.preprocess('data', img)
     out = net.forward()
-    
     pred_probas = out['prob']
 
     test_ids = test_ids + [img_path.split('/')[-1][:-4]]
     preds = preds + [pred_probas.argmax()]
 
+
+
     print img_path
-    #print pred_probas
-   
-    #print pred_probas.argmax()
+    print pred_probas
+    print pred_probas.argmax()
     if pred_probas.argmax()==1:
-        print 'La celula es ALTO GRADO'
+        print 'ALTO GRADO'
     else:
-        print 'La celula es BENIGNA'
+        print 'BENIGNA'
     print '-------'
 
-
 '''
-Crear fichero de resultados
+Making submission file
 '''
-with open("resultado.csv","w") as f:
+with open("modelos/resultados.csv","w") as f:
     f.write("id,tipo,label\n")
     for i in range(len(test_ids)):
         if preds[i]==1:

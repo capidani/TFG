@@ -18,6 +18,7 @@ import lmdb
 IMAGE_WIDTH = 227
 IMAGE_HEIGHT = 227
 
+
 def transform_img(img, img_width=IMAGE_WIDTH, img_height=IMAGE_HEIGHT):
 
     #Histogram Equalization
@@ -31,6 +32,32 @@ def transform_img(img, img_width=IMAGE_WIDTH, img_height=IMAGE_HEIGHT):
     return img
 
 
+def transform_rotate_img(img, img_width=IMAGE_WIDTH, img_height=IMAGE_HEIGHT):
+    
+    #Histogram Equalization
+    img[:, :, 0] = cv2.equalizeHist(img[:, :, 0])
+    img[:, :, 1] = cv2.equalizeHist(img[:, :, 1])
+    img[:, :, 2] = cv2.equalizeHist(img[:, :, 2])
+    
+    #Image Resizing
+    img = cv2.resize(img, (img_width, img_height), interpolation = cv2.INTER_CUBIC)
+    
+    rows,cols,color = img.shape
+    tam = 5
+    indx = 0
+    #image rotate
+    dataImg = [img]
+    while (tam < 360):
+        M = cv2.getRotationMatrix2D((cols/2,rows/2),tam,1)
+        dst = cv2.warpAffine(img,M,(cols,rows))
+        dataImg.extend([dst])
+        #dataImg.append = dst
+        tam = tam + 5
+        indx = indx + 1
+    
+    
+    return dataImg
+
 def make_datum(img, label):
     #image is numpy.ndarray format. BGR instead of RGB
     return caffe_pb2.Datum(
@@ -43,9 +70,8 @@ def make_datum(img, label):
 train_lmdb = '/home/user_cudnn/aplicacionTFG/imagenes/train_lmdb'
 validation_lmdb = '/home/user_cudnn/aplicacionTFG/imagenes/validation_lmdb'
 
-os.system('rm -rf  ' + train_lmdb)
-os.system('rm -rf  ' + validation_lmdb)
-
+os.system('rm -rf ' + train_lmdb)
+os.system('rm -rf ' + validation_lmdb)
 
 train_data = [img for img in glob.glob("../imagenes/train/*tiff")]
 test_data = [img for img in glob.glob("../imagenes/test/*tiff")]
@@ -66,9 +92,12 @@ with in_db.begin(write=True) as in_txn:
             label = 0
         else:
             label = 1
-        datum = make_datum(img, label)
-        in_txn.put('{:0>5d}'.format(in_idx), datum.SerializeToString())
-        print '{:0>5d}'.format(in_idx) + ':' + img_path
+        global dataImg
+        imgData = transform_rotate_img(img, img_width=IMAGE_WIDTH, img_height=IMAGE_HEIGHT)
+        for img in imgData:
+            datum = make_datum(img, label)
+            in_txn.put('{:0>5d}'.format(in_idx), datum.SerializeToString())
+            print '{:0>5d}'.format(in_idx) + ':' + img_path
 in_db.close()
 
 
@@ -86,6 +115,8 @@ with in_db.begin(write=True) as in_txn:
         else:
             label = 1
         datum = make_datum(img, label)
+
+        imgData = transform_img(img, img_width=IMAGE_WIDTH, img_height=IMAGE_HEIGHT)
         in_txn.put('{:0>5d}'.format(in_idx), datum.SerializeToString())
         print '{:0>5d}'.format(in_idx) + ':' + img_path
 in_db.close()

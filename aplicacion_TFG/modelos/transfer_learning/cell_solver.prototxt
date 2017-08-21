@@ -1,4 +1,4 @@
-net: "/home/user_cudnn/aplicacionTFG/modelos/train.prototxt"
+net: "/home/user_cudnn/aplicacionTFG/modelos/transfer_learning/cell_train_val.prototxt"
 test_iter: 1000
 test_interval: 1000
 base_lr: 0.001
@@ -10,5 +10,5 @@ max_iter: 40000
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 5000
-snapshot_prefix: "tfg_model_1"
+snapshot_prefix: "/home/user_cudnn/aplicacionTFG/transfer_learning"
 solver_mode: GPU

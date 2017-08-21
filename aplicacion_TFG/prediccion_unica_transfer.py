@@ -49,8 +49,8 @@ mean_array = np.asarray(mean_blob.data, dtype=np.float32).reshape(
 
 
 #Read model architecture and trained model's weights
-net = caffe.Net('/home/user_cudnn/aplicacionTFG/modelos/deploy.prototxt',
-                '/home/user_cudnn/aplicacionTFG/modelos/tfg_modelo_prediccion.caffemodel',
+net = caffe.Net('/home/user_cudnn/aplicacionTFG/modelos/transfer_learning/cell_deploy.prototxt',
+                '/home/user_cudnn/aplicacionTFG/modelos/tfg_modelo_transfer.caffemodel',
                 caffe.TEST)
 
 #Define image transformers

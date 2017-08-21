@@ -1,7 +1,7 @@
 '''
-    Author          :Adil Moujahid
-
-    '''
+Autor          :Adil Moujahid
+Modificacion   :Daniel Capitan
+'''
 
 import os
 import sys

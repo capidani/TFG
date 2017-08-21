@@ -197,10 +197,10 @@ layer {
   }
 }
 layer {
-  name: "fc8"
+  name: "fc8-cellgood-cellbad"
   type: "InnerProduct"
   bottom: "fc7"
-  top: "fc8"
+  top: "fc8-cellgood-cellbad"
   inner_product_param {
     num_output: 2
   }
@@ -208,6 +208,6 @@ layer {
 layer {
   name: "prob"
   type: "Softmax"
-  bottom: "fc8"
+  bottom: "fc8-cellgood-cellbad"
   top: "prob"
 }
